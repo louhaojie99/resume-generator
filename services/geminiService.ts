@@ -3,7 +3,16 @@ import { ResumeData, ATSResult } from "../types";
 
 // Note: In a real production app, you should proxy these calls through a backend
 // to protect the API Key. For this demo, we use the env variable directly.
-const API_KEY = process.env.API_KEY || '';
+// Safely access process.env to avoid crashes in browser environments without polyfills
+const getApiKey = () => {
+  try {
+    return process.env.API_KEY || '';
+  } catch (e) {
+    return '';
+  }
+};
+
+const API_KEY = getApiKey();
 
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 

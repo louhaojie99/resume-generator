@@ -16,3 +16,25 @@
 *   Tailwind CSS
 *   Google Gemini API (@google/genai)
 *   html2pdf.js / Lucide React
+
+## 🛠️ 部署与使用
+
+### Vercel 一键部署
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyour-repo%2Fdevresume&env=API_KEY)
+
+1.  点击上方按钮部署到 Vercel。
+2.  在部署设置中配置 Environment Variable: `API_KEY` (Gemini API Key)。
+3.  等待部署完成即可访问。
+
+### GitHub Pages / 静态部署
+
+本项目纯前端实现，适配 GitHub Pages 部署。
+
+1.  Clone 本仓库。
+2.  配置 `process.env.API_KEY` (如需使用 AI 功能，需在构建工具中配置 define 插件或环境变量)。
+3.  构建并部署到静态服务器或 GitHub Pages。
+
+## 📄 开源协议
+
+MIT License. 欢迎 Fork 和 Star！
