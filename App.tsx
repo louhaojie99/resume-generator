@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { ResumeData } from './types';
 import ResumeForm from './components/ResumeForm';
 import ResumePreview from './components/ResumePreview';
-import { Download, FileJson, FileText } from 'lucide-react';
+import { Download, FileJson, FileText, Github } from 'lucide-react';
 import { generateMarkdown, generateHTMLForWord, downloadFile } from './utils/exportHelpers';
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 
 // Initial Data (Chinese Demo)
 const INITIAL_DATA: ResumeData = {
@@ -120,21 +122,16 @@ const App: React.FC = () => {
     const element = document.getElementById('resume-preview');
     if (!element) return;
 
-    // @ts-ignore - html2pdf is loaded via CDN in index.html
-    if (window.html2pdf) {
-      const opt = {
-        margin: [0, 0, 0, 0], // Removed default margins as we control padding in the component
-        filename: `${resumeData.personalInfo.fullName}_简历.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-      };
-      // @ts-ignore
-      window.html2pdf().set(opt).from(element).save();
-    } else {
-      alert("PDF 生成库尚未加载，请稍候。");
-    }
+    const opt = {
+      margin: [0, 0, 0, 0], // Removed default margins as we control padding in the component
+      filename: `${resumeData.personalInfo.fullName}_简历.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+    
+    html2pdf().set(opt).from(element).save();
   };
 
   const handleExportMD = () => {
@@ -189,6 +186,17 @@ const App: React.FC = () => {
           >
             <Download size={16} /> PDF
           </button>
+          
+          {/* GitHub Repo Link */}
+          <a 
+            href="https://github.com/louhaojie99/resume-generator"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-gray-900 text-white px-4 py-2 rounded shadow hover:bg-black flex items-center gap-2 text-sm transition-colors"
+            title="GitHub 源码"
+          >
+            <Github size={16} /> GitHub
+          </a>
         </div>
 
         {/* Preview Container */}
