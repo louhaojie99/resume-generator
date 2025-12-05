@@ -2,6 +2,13 @@
 
 专为前端工程师打造的开源简历制作工具。助你快速生成专业、美观的简历。
 
+
+## 🌐 在线体验
+
+- 主站访问：[Vercel App](https://louhaojie99.github.io/resume-generator/)（推荐，速度更快）
+
+- 备用站点：[GitHub Pages](https://resume-generator-git-main-louhaojie99s-projects.vercel.app/?_vercel_share=hJmPiG6X8R3kujWdi0KmdJC6p5O1PxeS/)
+
 ## ✨ 主要功能
 
 *   **前端专用模板**：针对前端技术栈（Skills, Projects）优化的垂直布局，清晰展示核心竞争力。
