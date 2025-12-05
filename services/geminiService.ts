@@ -1,5 +1,5 @@
-import { GoogleGenAI, Type } from "@google/genai";
-import { ResumeData, ATSResult } from "../types";
+import { GoogleGenAI } from "@google/genai";
+import { ResumeData } from "../types";
 
 // Note: In a real production app, you should proxy these calls through a backend
 // to protect the API Key. For this demo, we use the env variable directly.
@@ -77,68 +77,6 @@ export const GeminiService = {
     } catch (error) {
       console.error("Gemini bullet improvement error:", error);
       return bullet;
-    }
-  },
-
-  /**
-   * Performs a mock ATS scan on the resume.
-   */
-  async checkATS(resume: ResumeData): Promise<ATSResult> {
-    if (!API_KEY) {
-      return {
-        score: 0,
-        missingKeywords: ["API Key Missing"],
-        suggestions: ["请配置 Gemini API Key 以使用此功能。"]
-      };
-    }
-
-    try {
-      // Flatten skills for context
-      const allSkills = resume.skills.flatMap(s => s.skills).join(", ");
-      const expText = resume.experience.map(e => `${e.position} at ${e.company}: ${e.highlights.join(". ")}`).join("\n");
-      
-      const prompt = `
-        请像一个严格的ATS（招聘管理系统）系统一样分析这份前端工程师简历。
-        
-        简历内容:
-        技能: ${allSkills}
-        工作经历: ${expText}
-        个人总结: ${resume.personalInfo.summary}
-        
-        请提供 JSON 格式的分析结果：
-        1. score (0-100 的整数评分)
-        2. missingKeywords (数组，列出缺失的关键前端技术栈或软技能关键词，中英文均可)
-        3. suggestions (数组，针对简历的具体优化建议，使用中文)
-      `;
-
-      const response = await ai.models.generateContent({
-        model: MODEL_FAST,
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              score: { type: Type.INTEGER },
-              missingKeywords: { type: Type.ARRAY, items: { type: Type.STRING } },
-              suggestions: { type: Type.ARRAY, items: { type: Type.STRING } }
-            }
-          }
-        }
-      });
-
-      if (response.text) {
-        return JSON.parse(response.text) as ATSResult;
-      }
-      throw new Error("No response text");
-
-    } catch (error) {
-      console.error("Gemini ATS check error:", error);
-      return {
-        score: 0,
-        missingKeywords: [],
-        suggestions: ["分析出错，请稍后重试。"]
-      };
     }
   }
 };

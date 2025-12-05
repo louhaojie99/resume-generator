@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ResumeData, ATSResult } from './types';
+import { ResumeData } from './types';
 import ResumeForm from './components/ResumeForm';
 import ResumePreview from './components/ResumePreview';
-import { Download, FileJson, FileText, CheckCircle, AlertTriangle, X } from 'lucide-react';
+import { Download, FileJson, FileText } from 'lucide-react';
 import { generateMarkdown, generateHTMLForWord, downloadFile } from './utils/exportHelpers';
-import { GeminiService } from './services/geminiService';
 
 // Initial Data (Chinese Demo)
 const INITIAL_DATA: ResumeData = {
@@ -99,9 +98,6 @@ const App: React.FC = () => {
   });
   
   const [scale, setScale] = useState(0.8);
-  const [atsResult, setAtsResult] = useState<ATSResult | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [showAtsModal, setShowAtsModal] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('resumeData', JSON.stringify(resumeData));
@@ -151,14 +147,6 @@ const App: React.FC = () => {
     downloadFile(`${resumeData.personalInfo.fullName}_简历.doc`, html, 'application/msword');
   };
 
-  const runATSCheck = async () => {
-    setIsAnalyzing(true);
-    setShowAtsModal(true);
-    const result = await GeminiService.checkATS(resumeData);
-    setAtsResult(result);
-    setIsAnalyzing(false);
-  };
-
   return (
     <div className="flex h-screen overflow-hidden font-sans">
       
@@ -173,15 +161,6 @@ const App: React.FC = () => {
         </div>
         
         <ResumeForm data={resumeData} onChange={setResumeData} />
-        
-        <div className="p-4 bg-gray-50 border-t border-gray-200">
-           <button 
-             onClick={runATSCheck}
-             className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2 rounded-md shadow hover:opacity-90 transition-all flex items-center justify-center gap-2 font-medium"
-           >
-             <CheckCircle size={18} /> AI 简历诊断 (ATS Check)
-           </button>
-        </div>
       </div>
 
       {/* Right Area: Preview & Actions */}
@@ -217,76 +196,6 @@ const App: React.FC = () => {
           <ResumePreview data={resumeData} scale={scale} />
         </div>
       </div>
-
-      {/* ATS Modal */}
-      {showAtsModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="p-4 border-b flex justify-between items-center bg-gray-50">
-              <h2 className="font-bold text-lg flex items-center gap-2">
-                <CheckCircle className="text-purple-600" /> AI 简历诊断结果
-              </h2>
-              <button onClick={() => setShowAtsModal(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="p-6 overflow-y-auto">
-              {isAnalyzing ? (
-                <div className="text-center py-10">
-                  <div className="animate-spin w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                  <p className="text-gray-600">Gemini 正在分析您的简历关键词和结构...</p>
-                </div>
-              ) : atsResult ? (
-                <div className="space-y-6">
-                  {/* Score */}
-                  <div className="text-center">
-                    <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full border-4 text-2xl font-bold ${
-                      atsResult.score >= 80 ? 'border-green-500 text-green-700' : 
-                      atsResult.score >= 60 ? 'border-yellow-500 text-yellow-700' : 'border-red-500 text-red-700'
-                    }`}>
-                      {atsResult.score}
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">简历评分</p>
-                  </div>
-
-                  {/* Missing Keywords */}
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                      <AlertTriangle size={16} className="text-amber-500" /> 缺失关键词 (Missing Keywords)
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {atsResult.missingKeywords.length > 0 ? (
-                        atsResult.missingKeywords.map((kw, i) => (
-                          <span key={i} className="px-2 py-1 bg-amber-50 text-amber-700 text-xs rounded border border-amber-200">
-                            {kw}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-sm text-green-600">太棒了！没有发现关键技术词缺失。</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Suggestions */}
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">优化建议 (Suggestions)</h3>
-                    <ul className="space-y-2">
-                      {atsResult.suggestions.map((sug, i) => (
-                        <li key={i} className="text-sm text-gray-600 flex gap-2">
-                          <span className="text-purple-500">•</span> {sug}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-center text-red-500">分析失败，请重试。</p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

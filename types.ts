@@ -76,9 +76,3 @@ export interface ResumeData {
   education: Education[];
   selfEvaluation: string; // New optional field
 }
-
-export interface ATSResult {
-  score: number;
-  missingKeywords: string[];
-  suggestions: string[];
-}

@@ -1,5 +1,5 @@
 {
   "name": "DevResume.ai",
-  "description": "A specialized resume builder for Frontend Engineers featuring AI-powered content optimization, ATS checking, and multi-format export (PDF, Markdown, Word).",
+  "description": "A specialized resume builder for Frontend Engineers featuring AI-powered content optimization and multi-format export (PDF, Markdown, Word).",
   "requestFramePermissions": []
 }
