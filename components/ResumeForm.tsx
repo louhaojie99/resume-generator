@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { ResumeData, Experience, Project, SkillCategory, Education } from '../types';
-import { Plus, Trash2, Wand2, ChevronDown, ChevronUp, User, Briefcase, Code, GraduationCap, FolderGit2, Settings, UserCheck } from 'lucide-react';
-import { GeminiService } from '../services/geminiService';
+import { ResumeData, Experience, Project, Education } from '../types';
+import { Plus, Trash2, ChevronDown, ChevronUp, User, Briefcase, Code, GraduationCap, FolderGit2, UserCheck } from 'lucide-react';
 
 interface ResumeFormProps {
   data: ResumeData;
@@ -10,7 +9,6 @@ interface ResumeFormProps {
 
 const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
   const [activeSection, setActiveSection] = useState<string>('personal');
-  const [loadingAI, setLoadingAI] = useState<string | null>(null);
 
   const updatePersonalInfo = (field: string, value: string) => {
     onChange({
@@ -24,32 +22,6 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
       ...data,
       sectionTitles: { ...data.sectionTitles, [key]: value }
     });
-  };
-
-  const handleAISummary = async () => {
-    setLoadingAI('summary');
-    const skills = data.skills.flatMap(s => s.skills);
-    const newSummary = await GeminiService.optimizeSummary(
-      data.personalInfo.summary, 
-      data.personalInfo.title, 
-      skills
-    );
-    updatePersonalInfo('summary', newSummary);
-    setLoadingAI(null);
-  };
-
-  const handleAISelfEvaluation = async () => {
-    setLoadingAI('selfEval');
-    const skills = data.skills.flatMap(s => s.skills);
-    // Re-use optimizeSummary logic but maybe we can tweak prompt later. 
-    // For now, using a simple optimization.
-    const newEval = await GeminiService.optimizeSummary(
-      data.selfEvaluation || '', 
-      data.personalInfo.title, 
-      skills
-    );
-    onChange({ ...data, selfEvaluation: newEval });
-    setLoadingAI(null);
   };
 
   // --- Experience Handlers ---
@@ -91,13 +63,6 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
       const newHighlights = exp.highlights.filter((_, i) => i !== index);
       updateExperience(expId, 'highlights', newHighlights);
   }
-
-  const handleAIBullet = async (expId: string, index: number, text: string) => {
-    setLoadingAI(`exp-${expId}-${index}`);
-    const improved = await GeminiService.improveBulletPoint(text);
-    updateHighlight(expId, index, improved);
-    setLoadingAI(null);
-  };
 
   // --- Skills Handlers ---
   const updateSkillCategory = (id: string, name: string) => {
@@ -315,14 +280,6 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                  onChange={(e) => updateSectionTitle('summary', e.target.value)}
                  className="font-bold text-gray-700 border-b border-dashed border-gray-300 focus:border-blue-500 outline-none text-sm w-32"
                />
-               <button 
-                  onClick={handleAISummary}
-                  disabled={!!loadingAI}
-                  className="flex items-center gap-1 text-xs text-purple-600 hover:text-purple-700 font-medium disabled:opacity-50"
-                >
-                  <Wand2 size={12} />
-                  {loadingAI === 'summary' ? 'AI 正在优化...' : 'AI 优化总结'}
-                </button>
             </div>
             <div>
               <textarea 
@@ -476,14 +433,6 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                         onChange={(e) => updateHighlight(exp.id, idx, e.target.value)}
                       />
                       <div className="flex flex-col gap-1">
-                        <button 
-                          onClick={() => handleAIBullet(exp.id, idx, h)}
-                          disabled={!!loadingAI}
-                          className="p-1 text-purple-600 hover:bg-purple-50 rounded"
-                          title="AI 润色"
-                        >
-                          <Wand2 size={14} />
-                        </button>
                         <button 
                           onClick={() => removeHighlight(exp.id, idx)}
                           className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
@@ -709,14 +658,6 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                  onChange={(e) => updateSectionTitle('selfEvaluation', e.target.value)}
                  className="font-bold text-gray-700 border-b border-dashed border-gray-300 focus:border-blue-500 outline-none text-sm w-32"
                />
-               <button 
-                  onClick={handleAISelfEvaluation}
-                  disabled={!!loadingAI}
-                  className="flex items-center gap-1 text-xs text-purple-600 hover:text-purple-700 font-medium disabled:opacity-50"
-                >
-                  <Wand2 size={12} />
-                  {loadingAI === 'selfEval' ? 'AI 正在优化...' : 'AI 优化评价'}
-                </button>
             </div>
              <div>
               <textarea 
