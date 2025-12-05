@@ -1,6 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+// Manually declare process to avoid "Cannot find name 'process'" error 
+// since @types/node might not be installed in the build environment.
+declare const process: { env: Record<string, string | undefined> };
+
 export default defineConfig({
   plugins: [react()],
   // Adapt base path for Vercel (root) vs GitHub Pages (repo subpath)
