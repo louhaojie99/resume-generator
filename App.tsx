@@ -123,11 +123,11 @@ const App: React.FC = () => {
     if (!element) return;
 
     const opt = {
-      margin: [0, 0, 0, 0], // Removed default margins as we control padding in the component
+      margin: 0, // Removed default margins as we control padding in the component
       filename: `${resumeData.personalInfo.fullName}_简历.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const },
       pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
     
@@ -141,7 +141,18 @@ const App: React.FC = () => {
 
   const handleExportWord = () => {
     const html = generateHTMLForWord(resumeData);
-    downloadFile(`${resumeData.personalInfo.fullName}_简历.doc`, html, 'application/msword');
+    
+    // Check if html-docx-js is loaded (from global script)
+    // @ts-ignore
+    if (window.htmlDocx) {
+      // @ts-ignore
+      const blob = window.htmlDocx.asBlob(html);
+      downloadFile(`${resumeData.personalInfo.fullName}_简历.docx`, blob, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    } else {
+      // Fallback to HTML-as-DOC
+      console.warn('html-docx-js not loaded, falling back to .doc');
+      downloadFile(`${resumeData.personalInfo.fullName}_简历.doc`, html, 'application/msword');
+    }
   };
 
   return (
@@ -177,7 +188,7 @@ const App: React.FC = () => {
             className="bg-blue-700 text-white px-4 py-2 rounded shadow hover:bg-blue-600 flex items-center gap-2 text-sm"
             title="导出 Word"
           >
-            <FileText size={16} /> Word
+            <FileText size={16} /> Word (.docx)
           </button>
           <button 
             onClick={handleExportPDF}

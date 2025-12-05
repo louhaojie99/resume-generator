@@ -72,8 +72,8 @@ export const generateMarkdown = (data: ResumeData): string => {
 };
 
 // Helper to trigger download
-export const downloadFile = (filename: string, content: string, type: string) => {
-  const blob = new Blob([content], { type });
+export const downloadFile = (filename: string, content: string | Blob, type: string = 'text/plain') => {
+  const blob = content instanceof Blob ? content : new Blob([content], { type });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -90,12 +90,12 @@ export const generateHTMLForWord = (data: ResumeData): string => {
     
     // Simple conversion for demo purposes - replacing newlines with breaks
     const content = md
-        .replace(/^# (.*$)/gim, '<h1 style="font-size: 24pt; color: #333; text-align: center;">$1</h1>')
+        .replace(/^# (.*$)/gim, '<h1 style="font-size: 24pt; color: #333; text-align: center; margin-bottom: 10px;">$1</h1>')
         .replace(/^## (.*$)/gim, '<h2 style="font-size: 14pt; color: #2563eb; margin-top: 20px; border-bottom: 1px solid #ccc; padding-bottom: 4px;">$1</h2>')
-        .replace(/^### (.*$)/gim, '<h3 style="font-size: 11pt; font-weight: bold; margin-top: 15px; color: #333;">$1</h3>')
+        .replace(/^### (.*$)/gim, '<h3 style="font-size: 11pt; font-weight: bold; margin-top: 15px; color: #333; background-color: #f8f9fa; padding: 4px;">$1</h3>')
         .replace(/\*\*(.*)\*\*/gim, '<b>$1</b>')
         .replace(/\*(.*)\*/gim, '<i>$1</i>')
-        .replace(/^- (.*$)/gim, '<li style="margin-bottom: 4px;">$1</li>')
+        .replace(/^- (.*$)/gim, '<li style="margin-bottom: 4px; margin-left: 20px;">$1</li>')
         .replace(/\n/gim, '<br />');
 
     return `
@@ -103,8 +103,26 @@ export const generateHTMLForWord = (data: ResumeData): string => {
         <head>
             <meta charset='utf-8'>
             <title>${data.personalInfo.fullName} 简历</title>
+            <!-- Define A4 Page Setup for Word -->
+            <style>
+                @page {
+                    size: 21.0cm 29.7cm;
+                    margin: 2.0cm 2.0cm 2.0cm 2.0cm;
+                    mso-page-orientation: portrait;
+                }
+                body {
+                    font-family: 'Microsoft YaHei', Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    background-color: #fff;
+                }
+                /* Ensure tables or containers don't overflow */
+                div, table {
+                    max-width: 100%;
+                }
+            </style>
         </head>
-        <body style="font-family: 'Microsoft YaHei', Arial, sans-serif; line-height: 1.6; color: #333;">
+        <body>
             ${content}
         </body>
         </html>

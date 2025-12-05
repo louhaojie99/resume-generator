@@ -20,19 +20,39 @@
 
 ### Vercel 一键部署
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyour-repo%2Fdevresume)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flouhaojie99%2Fresume-generator)
 
 1.  点击上方按钮部署到 Vercel。
 2.  等待部署完成即可访问。
 
-### GitHub Pages / 静态部署
+### GitHub Pages 部署
 
-本项目纯前端实现，适配 GitHub Pages 部署。
+本项目支持通过 GitHub Actions 或 `gh-pages` 分支部署。
 
-1.  Clone 本仓库。
-2.  安装依赖 `npm install`。
-3.  构建 `npm run build`。
-4.  将 `dist` 目录部署到静态服务器或 GitHub Pages。
+#### 1. 配置项目
+项目已预配置 `gh-pages` 部署脚本。确保 `package.json` 中的 `homepage` 和 `vite.config.ts` 中的 `base` 与你的仓库路径一致。
+
+#### 2. 执行部署
+在本地终端运行以下命令，将构建产物推送到 `gh-pages` 分支：
+
+```bash
+npm run deploy
+```
+
+#### 3. 关键步骤：配置 GitHub Pages 设置
+部署脚本执行成功后，你需要手动更改 GitHub 仓库设置以指向正确的分支：
+
+1.  进入 GitHub 仓库页面。
+2.  点击 **Settings** (设置) -> **Pages** (页面)。
+3.  在 **Build and deployment** (构建与部署) 下：
+    *   **Source**: 选择 "Deploy from a branch" (从分支部署)。
+    *   **Branch**: 选择 `gh-pages` 分支（**注意：不是 main 分支**）。
+    *   **Folder**: 选择 `/ (root)`。
+4.  点击 **Save** (保存)。
+
+等待几分钟后，刷新页面即可看到部署链接。
+
+**注意**: 项目已包含 `.nojekyll` 文件以禁用 Jekyll 处理，这可以防止 "Jekyll encountered an error" 类的错误。
 
 ## 📄 开源协议
 

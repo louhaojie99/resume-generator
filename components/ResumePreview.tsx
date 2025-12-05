@@ -27,7 +27,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, scale = 1 }) => {
         const onePageHeightPx = (contentWidth / 210) * 297;
         
         if (onePageHeightPx > 0) {
-          const pages = Math.ceil(contentHeight / onePageHeightPx);
+          // Add a small buffer to avoid flickering or edge cases
+          const pages = Math.ceil((contentHeight - 1) / onePageHeightPx);
           setTotalPages(Math.max(pages, 1));
         }
       }
@@ -70,7 +71,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, scale = 1 }) => {
         id="resume-preview" 
         className="bg-white shadow-2xl mx-auto relative z-10"
         style={{ 
-          minHeight: `${totalPages * 297}mm`, // Snap to full A4 pages
+          // Subtract 1px to ensure it fits perfectly within the PDF page boundaries without triggering a new page
+          minHeight: `calc(${totalPages * 297}mm - 1px)`, 
           fontFamily: '"Microsoft YaHei", "Inter", sans-serif' 
         }}
       >
@@ -91,7 +93,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, scale = 1 }) => {
             </div>
             
             {/* Right: Contact & Links - Icons Left Aligned */}
-            <div className="text-sm text-slate-700 min-w-[200px] flex flex-col gap-2">
+            <div className="text-sm text-slate-700 min-w-[200px] max-w-[280px] flex flex-col gap-2">
                {personalInfo.phone && (
                  <div className="flex items-center gap-3">
                    <div className="w-5 flex justify-center text-slate-500"><Phone size={16} /></div>
@@ -101,13 +103,13 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, scale = 1 }) => {
                {personalInfo.email && (
                  <div className="flex items-center gap-3">
                    <div className="w-5 flex justify-center text-slate-500"><Mail size={16} /></div>
-                   <span>{personalInfo.email}</span>
+                   <span className="break-all">{personalInfo.email}</span>
                  </div>
                )}
                {personalInfo.github && (
                  <div className="flex items-center gap-3">
                    <div className="w-5 flex justify-center text-slate-500"><Github size={16} /></div>
-                   <a href={`https://${personalInfo.github.replace(/^https?:\/\//, '')}`} target="_blank" rel="noreferrer" className="hover:text-blue-600 hover:underline">
+                   <a href={`https://${personalInfo.github.replace(/^https?:\/\//, '')}`} target="_blank" rel="noreferrer" className="hover:text-blue-600 hover:underline break-all">
                      {personalInfo.github.replace(/^https?:\/\//, '')}
                    </a>
                  </div>
@@ -115,7 +117,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, scale = 1 }) => {
                {personalInfo.socials.map((social, idx) => (
                   <div key={idx} className="flex items-center gap-3">
                      <div className="w-5 flex justify-center text-slate-500"><Globe size={16} /></div>
-                     <a href={social.url} target="_blank" rel="noreferrer" className="hover:text-blue-600 hover:underline truncate max-w-[220px]">
+                     <a href={social.url} target="_blank" rel="noreferrer" className="hover:text-blue-600 hover:underline break-all">
                         {social.url.replace(/^https?:\/\//, '')}
                      </a>
                   </div>
