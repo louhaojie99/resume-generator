@@ -4,8 +4,6 @@ import ResumeForm from './components/ResumeForm';
 import ResumePreview from './components/ResumePreview';
 import { Download, FileJson, FileText, Github } from 'lucide-react';
 import { generateMarkdown, generateHTMLForWord, downloadFile } from './utils/exportHelpers';
-// @ts-ignore
-import html2pdf from 'html2pdf.js';
 
 // Initial Data (Chinese Demo)
 const INITIAL_DATA: ResumeData = {
@@ -100,6 +98,7 @@ const App: React.FC = () => {
   });
   
   const [scale, setScale] = useState(0.8);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('resumeData', JSON.stringify(resumeData));
@@ -118,20 +117,34 @@ const App: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     const element = document.getElementById('resume-preview');
     if (!element) return;
-
-    const opt = {
-      margin: 0, // Removed default margins as we control padding in the component
-      filename: `${resumeData.personalInfo.fullName}_简历.pdf`,
-      image: { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-      jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    };
     
-    html2pdf().set(opt).from(element).save();
+    setIsExportingPDF(true);
+
+    try {
+      // Dynamic import to split chunk and reduce initial bundle size
+      // @ts-ignore
+      const html2pdfModule = await import('html2pdf.js');
+      const html2pdf = (html2pdfModule.default || html2pdfModule) as any;
+
+      const opt = {
+        margin: 0, // Removed default margins as we control padding in the component
+        filename: `${resumeData.personalInfo.fullName}_简历.pdf`,
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+        jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+      
+      await html2pdf().set(opt).from(element).save();
+    } catch (error) {
+      console.error('PDF Export failed:', error);
+      alert('PDF导出失败，请重试');
+    } finally {
+      setIsExportingPDF(false);
+    }
   };
 
   const handleExportMD = () => {
@@ -192,10 +205,11 @@ const App: React.FC = () => {
           </button>
           <button 
             onClick={handleExportPDF}
-            className="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-500 flex items-center gap-2 text-sm"
+            disabled={isExportingPDF}
+            className={`${isExportingPDF ? 'bg-red-400 cursor-wait' : 'bg-red-600 hover:bg-red-500'} text-white px-4 py-2 rounded shadow flex items-center gap-2 text-sm transition-colors`}
             title="导出 PDF"
           >
-            <Download size={16} /> PDF
+            <Download size={16} /> {isExportingPDF ? '生成中...' : 'PDF'}
           </button>
           
           {/* GitHub Repo Link */}

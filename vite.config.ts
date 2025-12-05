@@ -6,14 +6,27 @@ export default defineConfig({
   // Adapt base path for Vercel (root) vs GitHub Pages (repo subpath)
   base: process.env.VERCEL ? '/' : '/resume-generator/',
   build: {
-    // Increase the chunk size warning limit to avoid warnings for large libraries like html2pdf
-    chunkSizeWarningLimit: 1600,
+    // Keep the limit high to suppress warnings for large chunks if they still occur
+    chunkSizeWarningLimit: 2000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Separate vendor libraries into their own chunks to improve caching and load performance
-          vendor: ['react', 'react-dom', 'lucide-react'],
-          pdf: ['html2pdf.js']
+        // Use a function for manualChunks to robustly separate vendor dependencies
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // Note: html2pdf.js is dynamically imported in App.tsx, so it will automatically 
+            // be split into its own chunk by Vite. 
+            
+            // Explicitly separate React dependencies
+            if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
+              return 'react-vendor';
+            }
+            // Separate Lucide icons
+            if (id.includes('lucide-react')) {
+              return 'lucide';
+            }
+            // All other third-party modules
+            return 'vendor';
+          }
         }
       }
     }
