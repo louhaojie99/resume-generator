@@ -2,6 +2,8 @@
 
 专为前端工程师打造的开源简历制作工具。助你快速生成专业、美观的简历。
 
+<img width="3024" height="1592" alt="image" src="https://github.com/user-attachments/assets/752d1792-b7a1-4b1c-beef-79f64c42698e" />
+
 ## ✨ 主要功能
 
 *   **前端专用模板**：针对前端技术栈（Skills, Projects）优化的垂直布局，清晰展示核心竞争力。
