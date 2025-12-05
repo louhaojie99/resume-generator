@@ -5,9 +5,9 @@
 
 ## 🌐 在线体验
 
-- 主站访问：[Vercel App](https://louhaojie99.github.io/resume-generator/)（推荐，速度更快）
+- 主站访问：[Vercel App](https://resume-generator-git-main-louhaojie99s-projects.vercel.app/?_vercel_share=hJmPiG6X8R3kujWdi0KmdJC6p5O1PxeS/)（推荐，速度更快）
 
-- 备用站点：[GitHub Pages](https://resume-generator-git-main-louhaojie99s-projects.vercel.app/?_vercel_share=hJmPiG6X8R3kujWdi0KmdJC6p5O1PxeS/)
+- 备用站点：[GitHub Pages](https://louhaojie99.github.io/resume-generator/)
 
 ## ✨ 主要功能
 
